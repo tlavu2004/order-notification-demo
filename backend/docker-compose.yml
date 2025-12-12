@@ -3,15 +3,15 @@ services:
     image: postgres:${POSTGRES_VERSION}
     container_name: ${POSTGRES_CONTAINER_NAME}
     environment:
-      POSTGRES_DB: ${POSTGRES_SYSTEM_DB}
       POSTGRES_USER: ${POSTGRES_ROOT_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
-    expose:
-      - "5432"
+    ports:
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ROOT_USER} -d ${POSTGRES_SYSTEM_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ROOT_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,18 +19,17 @@ services:
       - microservices-network
 
   mongodb:
-    image: mongo:${MONGODB_VERSION}
-    container_name: ${MONGODB_CONTAINER_NAME}
+    image: mongo:${MONGO_VERSION}
+    container_name: ${MONGO_CONTAINER_NAME}
     environment:
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    expose:
-      - "27017"
+    ports:
+      - ${MONGO_PORT}:27017
     volumes:
       - mongodb-data:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand({ ping: 1 })' | mongosh --quiet"]
+      test: ["CMD-SHELL", "mongosh --eval 'db.runCommand({ ping: 1 })'"]
       interval: 10s
       timeout: 5s
       retries: 5

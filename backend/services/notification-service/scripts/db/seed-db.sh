@@ -4,12 +4,12 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-source "$SCRIPT_DIR/../common/load-env.sh"
+source "$SCRIPT_DIR/../common/load-mongo-env.sh"
+source "$SCRIPT_DIR/../common/mongo-client.sh"
 
-export $(grep -v '^#' "$SERVICE_DIR/.env" | xargs)
+echo "Seeding MongoDB database '$MONGO_DB' via container '$MONGO_CONTAINER_NAME'..."
 
-# Seed sample notifications
-mongosh "$MONGO_URI" --eval "
+mongo_eval "
   db = db.getSiblingDB('$MONGO_DB');
 
   db.notifications.insertMany([
@@ -35,3 +35,5 @@ mongosh "$MONGO_URI" --eval "
 
   print('Seeded ' + db.notifications.countDocuments() + ' notifications');
 "
+
+echo "MongoDB seed completed successfully."

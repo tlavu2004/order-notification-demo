@@ -1,14 +1,10 @@
 #!/bin/bash
 
+set -e
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
 
-if [ ! -f "$SERVICE_DIR/.env" ]; then
-  echo ".env file not found!"
-  exit 1
-fi
-
-export $(grep -v '^#' "$SERVICE_DIR/.env" | xargs)
+source "$SCRIPT_DIR/../common/load-env.sh"
 
 mongosh "$MONGO_URI" --eval "
   db = db.getSiblingDB('$MONGO_DB');

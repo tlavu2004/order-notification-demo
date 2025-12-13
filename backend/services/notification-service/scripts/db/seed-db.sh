@@ -1,12 +1,10 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICE_DIR="$(dirname "$SCRIPT_DIR")"
+set -e
 
-if [ ! -f "$SERVICE_DIR/.env" ]; then
-  echo ".env file not found!"
-  exit 1
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$SCRIPT_DIR/../common/load-env.sh"
 
 export $(grep -v '^#' "$SERVICE_DIR/.env" | xargs)
 

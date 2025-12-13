@@ -17,8 +17,14 @@ set -a
 . "$SERVICE_DIR/.env"
 set +a
 
-# Check required variables
-required_vars=(POSTGRES_DB_URL POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB)
+# Validate required variables
+required_vars=(
+  POSTGRES_DB_URL
+  POSTGRES_USER
+  POSTGRES_PASSWORD
+  POSTGRES_DB
+)
+
 for var in "${required_vars[@]}"; do
   if [ -z "${!var}" ]; then
     echo "ERROR: Required variable '$var' is missing in .env" >&2
@@ -48,6 +54,8 @@ export FLYWAY_PASSWORD="$POSTGRES_PASSWORD"
 mvn flyway:clean -Dflyway.cleanDisabled=false
 
 # Unset sensitive env vars after use
+unset FLYWAY_URL
+unset FLYWAY_USER
 unset FLYWAY_PASSWORD
 
 echo "PostgreSQL database '$POSTGRES_DB' cleaned successfully!"

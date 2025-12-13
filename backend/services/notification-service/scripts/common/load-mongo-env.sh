@@ -34,6 +34,8 @@ set +a
 required_vars=(
   MONGO_CONTAINER_NAME
   MONGO_DB
+  MONGO_USER
+  MONGO_PASSWORD
 )
 
 for var in "${required_vars[@]}"; do

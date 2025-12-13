@@ -18,27 +18,36 @@ set -a
 set +a
 
 # Check required variables
-if [ -z "$POSTGRES_DB_URL" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ]; then
-  echo "Required PostgreSQL variables missing in .env!"
-  exit 1
-fi
+required_vars=(POSTGRES_DB_URL POSTGRES_USER POSTGRES_PASSWORD POSTGRES_DB)
+for var in "${required_vars[@]}"; do
+  if [ -z "${!var}" ]; then
+    echo "ERROR: Required variable '$var' is missing in .env" >&2
+    exit 1
+  fi
+done
 
+# Confirm destructive action
 read -r -p "Are you sure you want to DROP PostgreSQL database '$POSTGRES_DB'? Type 'yes' to continue: " confirm
 if [ "$confirm" != "yes" ]; then
   echo "Aborted."
   exit 0
 fi
 
-# Run Flyway clean
+# Change to service directory
 cd "$SERVICE_DIR" || {
   echo "ERROR: Cannot cd to $SERVICE_DIR" >&2
   exit 1
 }
 
-mvn flyway:clean \
-  -Dflyway.cleanDisabled=false \
-  -Dflyway.url="$POSTGRES_DB_URL" \
-  -Dflyway.user="$POSTGRES_USER" \
-  -Dflyway.password="$POSTGRES_PASSWORD"
+# Set environment variables for Flyway (secure, cross-platform)
+export FLYWAY_URL="$POSTGRES_DB_URL"
+export FLYWAY_USER="$POSTGRES_USER"
+export FLYWAY_PASSWORD="$POSTGRES_PASSWORD"
+
+# Run Flyway clean
+mvn flyway:clean -Dflyway.cleanDisabled=false
+
+# Unset sensitive env vars after use
+unset FLYWAY_PASSWORD
 
 echo "PostgreSQL database '$POSTGRES_DB' cleaned successfully!"

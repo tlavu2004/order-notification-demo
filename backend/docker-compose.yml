@@ -11,7 +11,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-scripts/postgres:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_ROOT_USER}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h localhost -p 5432 -U $$POSTGRES_ROOT_USER"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +33,14 @@ services:
     volumes:
       - mongodb-data:/data/db
     healthcheck:
-      test: ["CMD-SHELL", "mongosh --eval 'db.runCommand({ ping: 1 })'"]
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --username $$MONGO_INITDB_ROOT_USERNAME \
+                   --password $$MONGO_INITDB_ROOT_PASSWORD \
+                   --authenticationDatabase admin \
+                   --eval 'db.runCommand({ ping: 1 })'"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,6 +55,15 @@ services:
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
     ports:
       - "${ZOOKEEPER_CLIENT_PORT}:2181"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "echo ruok | nc localhost 2181 | grep imok"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - microservices-network
 
@@ -68,7 +88,11 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "broker:29092"]
+      test:
+        [
+          "CMD-SHELL",
+          "nc -z broker 29092 || exit 1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -86,6 +110,15 @@ services:
       KAFKA_CLUSTERS_0_ZOOKEEPER: "${ZOOKEEPER_CONTAINER_NAME}:${ZOOKEEPER_CLIENT_PORT}"
     ports:
       - "${KAFKA_UI_PORT}:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:8080/actuator/health | grep UP"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - microservices-network
 

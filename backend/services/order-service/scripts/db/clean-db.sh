@@ -2,7 +2,7 @@
 
 # Get the directory where script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICE_DIR="$(dirname "$SCRIPT_DIR")"  # Go up one level to service root
+SERVICE_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
 ENV_FILE="$SERVICE_DIR/.env"
 
@@ -13,7 +13,9 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 # Load variables from service .env
-export $(grep -v '^#' "$SERVICE_DIR/.env" | xargs)
+set -a
+. "$SERVICE_DIR/.env"
+set +a
 
 # Check required variables
 if [ -z "$POSTGRES_DB_URL" ] || [ -z "$POSTGRES_USER" ] || [ -z "$POSTGRES_PASSWORD" ]; then
@@ -28,8 +30,12 @@ if [ "$confirm" != "yes" ]; then
 fi
 
 # Run Flyway clean
-cd "$SERVICE_DIR"
-./mvnw flyway:clean \
+cd "$SERVICE_DIR" || {
+  echo "ERROR: Cannot cd to $SERVICE_DIR" >&2
+  exit 1
+}
+
+mvn flyway:clean \
   -Dflyway.cleanDisabled=false \
   -Dflyway.url="$POSTGRES_DB_URL" \
   -Dflyway.user="$POSTGRES_USER" \

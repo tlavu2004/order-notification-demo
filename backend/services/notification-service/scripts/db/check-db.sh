@@ -4,8 +4,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-source "$SCRIPT_DIR/../common/load-mongo-env.sh"
-source "$SCRIPT_DIR/../common/mongo-client.sh"
+. "$SCRIPT_DIR/../common/load-mongo-env.sh"
+. "$SCRIPT_DIR/../common/mongo-client.sh"
 
 echo "Checking MongoDB database '$MONGO_DB' via container '$MONGO_CONTAINER_NAME'..."
 

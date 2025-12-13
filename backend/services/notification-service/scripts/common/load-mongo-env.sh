@@ -17,7 +17,7 @@ fi
 set -a
 
 # shellcheck disable=SC1090
-source "$INFRA_ENV"
+. "$INFRA_ENV"
 
 # Load service env
 if [ ! -f "$SERVICE_ENV" ]; then
@@ -26,7 +26,7 @@ if [ ! -f "$SERVICE_ENV" ]; then
 fi
 
 # shellcheck disable=SC1090
-source "$SERVICE_ENV"
+. "$SERVICE_ENV"
 
 set +a
 

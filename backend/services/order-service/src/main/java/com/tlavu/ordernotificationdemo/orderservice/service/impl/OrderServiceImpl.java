@@ -4,13 +4,13 @@ import com.tlavu.ordernotificationdemo.orderservice.dto.OrderEventDTO;
 import com.tlavu.ordernotificationdemo.orderservice.dto.OrderRequestDTO;
 import com.tlavu.ordernotificationdemo.orderservice.dto.OrderResponseDTO;
 import com.tlavu.ordernotificationdemo.orderservice.exception.OrderNotFoundException;
+import com.tlavu.ordernotificationdemo.orderservice.kafka.OrderEventProducer;
 import com.tlavu.ordernotificationdemo.orderservice.mapper.OrderMapper;
 import com.tlavu.ordernotificationdemo.orderservice.model.Order;
 import com.tlavu.ordernotificationdemo.orderservice.model.OrderStatus;
 import com.tlavu.ordernotificationdemo.orderservice.repository.OrderRepository;
 import com.tlavu.ordernotificationdemo.orderservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +23,16 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final KafkaTemplate<String, OrderEventDTO> kafkaTemplate;
+    private final OrderEventProducer orderEventProducer;
     private final String topic;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             OrderMapper orderMapper,
-                            KafkaTemplate<String, OrderEventDTO> kafkaTemplate,
+                            OrderEventProducer orderEventProducer,
                             @Value("${order.events.topic:orders.events}") String topic) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
-        this.kafkaTemplate = kafkaTemplate;
+        this.orderEventProducer = orderEventProducer;
         this.topic = topic;
     }
 
@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
         OrderResponseDTO response = orderMapper.toResponseDto(saved);
 
         OrderEventDTO event = orderMapper.toEventDto(saved);
-        kafkaTemplate.send(topic, saved.getId().toString(), event);
+        orderEventProducer.sendOrderEvent(event);
 
         return response;
     }
@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
 
         OrderEventDTO event = orderMapper.toEventDto(saved);
-        kafkaTemplate.send(topic, saved.getId().toString(), event);
+        orderEventProducer.sendOrderEvent(event);
 
         return orderMapper.toResponseDto(saved);
     }

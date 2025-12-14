@@ -18,5 +18,13 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: true
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
 server:
   port: 8081
+
+order:
+  events:
+    topic: ${ORDER_EVENTS_TOPIC:order-events}
+

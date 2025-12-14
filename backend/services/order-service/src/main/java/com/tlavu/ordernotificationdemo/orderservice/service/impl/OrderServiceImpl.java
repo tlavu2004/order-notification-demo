@@ -10,7 +10,6 @@ import com.tlavu.ordernotificationdemo.orderservice.model.Order;
 import com.tlavu.ordernotificationdemo.orderservice.model.OrderStatus;
 import com.tlavu.ordernotificationdemo.orderservice.repository.OrderRepository;
 import com.tlavu.ordernotificationdemo.orderservice.service.OrderService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +23,15 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderEventProducer orderEventProducer;
-    private final String topic;
 
-    public OrderServiceImpl(OrderRepository orderRepository,
-                            OrderMapper orderMapper,
-                            OrderEventProducer orderEventProducer,
-                            @Value("${order.events.topic:orders.events}") String topic) {
+    public OrderServiceImpl(
+            OrderRepository orderRepository,
+            OrderMapper orderMapper,
+            OrderEventProducer orderEventProducer
+    ) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.orderEventProducer = orderEventProducer;
-        this.topic = topic;
     }
 
     @Override

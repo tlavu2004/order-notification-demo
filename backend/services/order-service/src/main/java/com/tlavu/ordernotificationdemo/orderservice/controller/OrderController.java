@@ -37,14 +37,16 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> getOrder(@PathVariable("id") UUID id) {
+    public ResponseEntity<OrderResponseDTO> getOrder(@PathVariable UUID id) {
         OrderResponseDTO dto = orderService.getOrder(id);
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<OrderResponseDTO> updateStatus(@PathVariable("id") UUID id,
-                                                         @Valid @RequestBody UpdateStatusDTO request) {
+    public ResponseEntity<OrderResponseDTO> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateStatusDTO request
+    ) {
         OrderStatus newStatus = request.getStatus();
         OrderResponseDTO updated = orderService.updateOrderStatus(id, newStatus);
         return ResponseEntity.ok(updated);

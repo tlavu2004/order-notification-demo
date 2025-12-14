@@ -1,121 +1,61 @@
 package com.tlavu.ordernotificationdemo.orderservice.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Order {
 
     @Id
+    @EqualsAndHashCode.Include
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "customer_name", nullable = false)
     private String customerName;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(name = "total_amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public Order() {
-    }
-
-    public Order(UUID id, String customerName, BigDecimal totalAmount, OrderStatus status, Instant createdAt) {
-        this.id = id;
-        this.customerName = customerName;
-        this.totalAmount = totalAmount;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-
-    public Order(String customerName, BigDecimal totalAmount, OrderStatus status) {
-        this.customerName = customerName;
-        this.totalAmount = totalAmount;
-        this.status = status;
-    }
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
     @PrePersist
     public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
+        if (id == null) {
+            id = UUID.randomUUID();
         }
-        if (this.createdAt == null) {
-            this.createdAt = Instant.now();
+        if (createdAt == null) {
+            createdAt = Instant.now();
         }
-        if (this.status == null) {
-            this.status = OrderStatus.PENDING;
+        if (updatedAt == null) {
+            updatedAt = Instant.now();
+        }
+        if (status == null) {
+            status = OrderStatus.PENDING;
         }
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", customerName='" + customerName + '\'' +
-                ", totalAmount=" + totalAmount +
-                ", status=" + status +
-                ", createdAt=" + createdAt +
-                '}';
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = Instant.now();
     }
 }

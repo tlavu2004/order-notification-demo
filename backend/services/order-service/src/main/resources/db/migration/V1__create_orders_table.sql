@@ -14,3 +14,16 @@ INSERT INTO orders (customer_name, total_amount, status) VALUES
 ('John Doe', 299.99, 'PENDING'),
 ('Jane Smith', 150.50, 'CONFIRMED'),
 ('Bob Johnson', 450.00, 'SHIPPED');
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_orders_updated_at
+    BEFORE UPDATE ON orders
+    FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

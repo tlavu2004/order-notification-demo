@@ -5,4 +5,3 @@ public enum NotificationType {
     ORDER_UPDATED,
     ORDER_CANCELLED
 }
-

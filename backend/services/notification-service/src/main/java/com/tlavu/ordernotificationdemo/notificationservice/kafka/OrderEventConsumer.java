@@ -18,9 +18,11 @@ public class OrderEventConsumer {
         this.notificationService = notificationService;
     }
 
-    @KafkaListener(topics = "${notification.kafka.topic:order-events}",
+    @KafkaListener(
+            topics = "${notification.kafka.topic:order.events.v1}",
             groupId = "${spring.kafka.consumer.group-id:notification-service-group}",
-            containerFactory = "kafkaListenerContainerFactory")
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consume(OrderEventDTO event) {
         if (event == null) {
             log.warn("Received null OrderEventDTO");

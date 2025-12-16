@@ -29,7 +29,7 @@ server:
 
 order:
   events:
-    topic: ${ORDER_EVENTS_TOPIC:order-events}
+    topic: ${ORDER_EVENTS_TOPIC:order.events.v1}
 
 logging:
   level:

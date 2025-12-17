@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS orders (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     customer_name VARCHAR(255) NOT NULL,
-    total_amount DECIMAL(10, 2) NOT NULL,
+    total_amount NUMERIC(19, 2) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -10,20 +10,8 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 
-INSERT INTO orders (customer_name, total_amount, status) VALUES
-('John Doe', 299.99, 'PENDING'),
-('Jane Smith', 150.50, 'CONFIRMED'),
-('Bob Johnson', 450.00, 'SHIPPED');
+INSERT INTO orders (id, customer_name, total_amount, status, created_at, updated_at) VALUES
+(gen_random_uuid(), 'John Doe', 299.99, 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(gen_random_uuid(), 'Jane Smith', 150.50, 'CONFIRMED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(gen_random_uuid(), 'Bob Johnson', 450.00, 'SHIPPED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-    RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_orders_updated_at
-    BEFORE UPDATE ON orders
-    FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();

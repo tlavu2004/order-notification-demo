@@ -12,28 +12,31 @@ echo "Seeding MongoDB database '$MONGO_DB' via container '$MONGO_CONTAINER_NAME'
 mongo_eval "
   db = db.getSiblingDB('$MONGO_DB');
 
-  db.notifications.insertMany([
+  db.notification_logs.insertMany([
     {
-      orderId: 'ORDER-001',
+      order_id: '550e8400-e29b-41d4-a716-446655440000',
       message: 'Order placed successfully',
-      status: 'sent',
-      createdAt: new Date()
+      type: 'ORDER_CREATED',
+      status: 'SENT',
+      sentAt: new Date()
     },
     {
-      orderId: 'ORDER-002',
+      order_id: '550e8400-e29b-41d4-a716-446655440001',
       message: 'Order shipped',
-      status: 'pending',
-      createdAt: new Date()
+      type: 'ORDER_UPDATED',
+      status: 'PENDING',
+      sentAt: new Date()
     },
     {
-      orderId: 'ORDER-003',
+      order_id: '550e8400-e29b-41d4-a716-446655440002',
       message: 'Order delivered',
-      status: 'sent',
-      createdAt: new Date()
+      type: 'ORDER_CANCELLED',
+      status: 'SENT',
+      sentAt: new Date()
     }
   ]);
 
-  print('Seeded ' + db.notifications.countDocuments() + ' notifications');
+  print('Seeded ' + db.notification_logs.countDocuments() + ' notification logs');
 "
 
 echo "MongoDB seed completed successfully."

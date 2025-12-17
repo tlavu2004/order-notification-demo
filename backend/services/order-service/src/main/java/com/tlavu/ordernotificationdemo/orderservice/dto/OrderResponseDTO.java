@@ -21,5 +21,6 @@ public class OrderResponseDTO {
     private BigDecimal totalAmount;
     private OrderStatus status;
     private Instant createdAt;
+    private Instant updatedAt;
 }
 

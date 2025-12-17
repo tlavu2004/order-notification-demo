@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ExecutionException;
+
 @Component
 public class OrderEventProducer {
 
@@ -27,14 +29,15 @@ public class OrderEventProducer {
         String key = event.getId().toString();
         LOGGER.debug("Sending order event to topic {} with key {}", topic, key);
 
-        kafkaTemplate.send(topic, key, event)
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        LOGGER.error("Failed to send order event for key={}: {}", key, ex.getMessage(), ex);
-                    } else {
-                        LOGGER.debug("Order event sent successfully for key={}", key);
-                    }
-                }
-        );
+        try {
+            kafkaTemplate.send(topic, key, event).get();
+            LOGGER.debug("Order event sent successfully for key={}", key);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("Interrupted while sending order event for key={}: {}", key, ie.getMessage(), ie);
+        } catch (ExecutionException ee) {
+            LOGGER.error("Failed to send order event for key={}: {}", key, ee.getMessage(), ee);
+            throw new RuntimeException("Failed to send order event", ee);
+        }
     }
 }

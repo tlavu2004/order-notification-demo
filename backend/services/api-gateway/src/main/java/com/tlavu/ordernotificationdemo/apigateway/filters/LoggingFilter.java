@@ -40,7 +40,7 @@ public class LoggingFilter implements GlobalFilter {
                                 ? exchange.getResponse().getStatusCode().value()
                                 : null;
                     } catch (Exception ex) {
-                        // ignore
+                        log.warn("Could not get response status code: {}", ex.getMessage());
                     }
                     if (status != null) {
                         log.info("Completed {} {} -> {} ({} ms)", method, path, status, duration);

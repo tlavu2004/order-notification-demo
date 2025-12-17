@@ -26,7 +26,10 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String, OrderEventDTO> consumerFactory() {
         JsonDeserializer<OrderEventDTO> deserializer = new JsonDeserializer<>(OrderEventDTO.class);
-        deserializer.addTrustedPackages("com.tlavu.ordernotificationdemo.notificationservice.dto");
+        deserializer.addTrustedPackages(
+                "com.tlavu.ordernotificationdemo.notificationservice.dto",
+                "com.tlavu.ordernotificationdemo.orderservice.dto"
+        );
 
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);

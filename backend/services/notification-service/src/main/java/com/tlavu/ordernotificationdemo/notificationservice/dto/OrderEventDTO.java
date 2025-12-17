@@ -1,5 +1,6 @@
 package com.tlavu.ordernotificationdemo.notificationservice.dto;
 
+import com.tlavu.ordernotificationdemo.notificationservice.model.NotificationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class OrderEventDTO {
     private UUID id;
     private String customerName;
     private BigDecimal totalAmount;
-    private String status;
+    private NotificationStatus status;
     private Instant createdAt;
 }
 

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -39,12 +40,18 @@ public class NotificationServiceImpl implements NotificationService {
         entry.setMessage(message);
         entry.setType(type);
         entry.setStatus(NotificationStatus.PENDING);
-        entry.setSentAt(Instant.now());
 
         NotificationLog saved = saveNotificationLog(entry);
 
         boolean sent = sendNotification(saved);
-        saved.setStatus(sent ? NotificationStatus.SENT : NotificationStatus.FAILED);
+        if (sent) {
+            saved.setSentAt(Instant.now());
+            saved.setStatus(NotificationStatus.SENT);
+            log.info("Notification sent successfully for orderId={}", event.getId());
+        } else {
+            saved.setStatus(NotificationStatus.FAILED);
+            log.error("Failed to send notification for orderId={}", event.getId());
+        }
         repository.save(saved);
     }
 
@@ -56,12 +63,22 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public List<NotificationLog> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public List<NotificationLog> findByOrderId(String orderId) {
+        return repository.findByOrderId(orderId);
+    }
+
+    @Override
     public NotificationLog saveNotificationLog(NotificationLog logEntry) {
         return repository.save(logEntry);
     }
 
     private String mapEventToMessage(OrderEventDTO event) {
-        String status = event.getStatus();
+        String status = event.getStatus().toString();
         return switch (status == null ? "" : status) {
             case "PENDING" -> "Your order " + event.getId() + " is pending confirmation.";
             case "CONFIRMED" -> "Your order " + event.getId() + " has been confirmed.";
@@ -73,11 +90,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private NotificationType mapEventToType(OrderEventDTO event) {
-        String status = event.getStatus();
+        String status = event.getStatus().toString();
         return switch (status == null ? "" : status) {
             case "PENDING" -> NotificationType.ORDER_CREATED;
             case "CANCELLED" -> NotificationType.ORDER_CANCELLED;
             default -> NotificationType.ORDER_UPDATED;
         };
     }
+
+
 }

@@ -1,7 +1,7 @@
 package com.tlavu.ordernotificationdemo.notificationservice.controller;
 
 import com.tlavu.ordernotificationdemo.notificationservice.model.NotificationLog;
-import com.tlavu.ordernotificationdemo.notificationservice.repository.NotificationLogRepository;
+import com.tlavu.ordernotificationdemo.notificationservice.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,23 +18,25 @@ public class NotificationController {
 
     private static final Logger log = LoggerFactory.getLogger(NotificationController.class);
 
-    private final NotificationLogRepository repository;
+    private final NotificationService notificationService;
 
-    public NotificationController(NotificationLogRepository repository) {
-        this.repository = repository;
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @GetMapping
     public ResponseEntity<List<NotificationLog>> getAll() {
-        List<NotificationLog> all = repository.findAll();
-        return ResponseEntity.ok(all);
+        List<NotificationLog> logs = notificationService.findAll();
+        return ResponseEntity.ok(logs);
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<NotificationLog>> getByOrderId(@PathVariable("orderId") String orderId) {
+    public ResponseEntity<List<NotificationLog>> getByOrderId(
+            @PathVariable String orderId
+    ) {
         log.info("Fetching notification logs for orderId={}", orderId);
-        List<NotificationLog> list = repository.findByOrderId(orderId);
-        return ResponseEntity.ok(list);
+        List<NotificationLog> logs = notificationService.findByOrderId(orderId);
+        return ResponseEntity.ok(logs);
     }
 }
 

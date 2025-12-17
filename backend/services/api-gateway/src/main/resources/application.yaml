@@ -52,3 +52,8 @@ management:
         allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
         allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
         allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}

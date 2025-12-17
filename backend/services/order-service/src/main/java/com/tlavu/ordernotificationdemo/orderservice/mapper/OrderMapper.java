@@ -13,10 +13,6 @@ public interface OrderMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(
-            target = "status",
-            expression = "java(com.tlavu.ordernotificationdemo.orderservice.model.OrderStatus.PENDING)"
-    )
     Order toEntity(OrderRequestDTO dto);
 
     OrderResponseDTO toResponseDto(Order order);

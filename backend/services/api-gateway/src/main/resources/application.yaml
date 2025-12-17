@@ -12,6 +12,7 @@ spring:
                 - Path=/api/orders/**
               filters:
                 - StripPrefix=0
+                - Retry=3
 
             - id: notification-service
               uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
@@ -19,6 +20,7 @@ spring:
                 - Path=/api/notifications/**
               filters:
                 - StripPrefix=0
+                - Retry=3
 
 server:
   port: 8080

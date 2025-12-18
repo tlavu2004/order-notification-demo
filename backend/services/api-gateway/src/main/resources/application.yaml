@@ -7,7 +7,7 @@ spring:
         webflux:
           routes:
             - id: order-service
-              uri: ${ORDER_SERVICE_URL:http://localhost:8081}
+              uri: lb://order-service
               predicates:
                 - Path=/api/orders/**
               filters:
@@ -28,7 +28,7 @@ spring:
                       basedOnPreviousValue: false
 
             - id: notification-service
-              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8082}
+              uri: lb://notification-service
               predicates:
                 - Path=/api/notifications/**
               filters:

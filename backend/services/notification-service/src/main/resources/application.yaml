@@ -19,6 +19,14 @@ notification:
   kafka:
     topic: ${NOTIFICATION_TOPIC:order.events.v1}
 
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}:${spring.application.instance_id:${random.value}}
+
 logging:
   level:
     com.tlavu.ordernotificationdemo.notificationservice.kafka: DEBUG
